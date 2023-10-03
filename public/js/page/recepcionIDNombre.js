@@ -15,13 +15,15 @@ export default (params)=>{
         const a = e.target.closest('.a_Ale0G7A')
         if(a){
             const item = JSON.parse(a.parentElement.dataset.data)
+            console.log(item);
             document.getElementById('root').append(modalProducto(item))
         }
     })
     
     const elementHTML =(data = {})=>{
+        
         const element = createHTML(`
-            <div class="div_21EH6K7" id="a-${ data.SAP }" data-data='${ JSON.stringify(data) }'>
+            <div class="div_21EH6K7" id="a-${ data.SAP }">
                 <a class="a_Ale0G7A icon">
                     <div class="div_686E97q">
                         <img src="public/img/products/product-${ data.SAP }.jpg">
@@ -44,6 +46,7 @@ export default (params)=>{
             </div>
         `)
 
+        element.setAttribute('data-data', JSON.stringify(data))
         return element
     }
 
