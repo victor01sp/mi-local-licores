@@ -642,5 +642,12 @@
     "ID_MARCA": "30",
     "EAN": 744607002295,
     "ID_CATEGORIA": "7"
+  },
+  {
+    "SAP": 991639,
+    "DESCRIPCION": "BITTER AMARGO CUISINE&COX75ML",
+    "ID_MARCA": "38",
+    "EAN": 2050044236451,
+    "ID_CATEGORIA": "6"
   }
 ]
