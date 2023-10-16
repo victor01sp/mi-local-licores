@@ -9,7 +9,7 @@ export default (data)=>{
                         <a class="a_Ale0G7A icon">
                             <div class="div_686E97q">
                                 <img src="public/img/products/${ data.SAP }.webp">
-                                <span>${ data.COUNT ?? 0 }</span>
+                                <span style="display:none">${ data.COUNT ?? 0 }</span>
                             </div>
                             <div class="div_R77tzMq">
                                 <p>${ data.DESCRIPCION }</p>
