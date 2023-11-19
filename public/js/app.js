@@ -1,16 +1,13 @@
 import style from "./setting/style.js"
-import routes from "./src/routes.js"
 import header from "./components/header.js"
-import navigate from "./components/navigate.js"
-const app =()=>{
+import main from "./components/main.js"
 
-    const root = getElement('#root')
-    root.innerHTML = `<main class="main_igx9mZT" id="main"></main>`
-    root.prepend(header())
-    root.append(navigate())
+const app =()=>{
+    
+    ss('api').data('https://api-metro.victor01sp.com').set()
 
     style()
-    routes()
+    document.getElementById('root').append( header(), main() )
 
     addEventListener('contextmenu', e => e.preventDefault())
 }

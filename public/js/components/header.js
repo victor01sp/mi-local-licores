@@ -2,7 +2,7 @@ import style from "../setting/style.js"
 
 export default ()=>{
     const ElementComponent = createHTML(`
-        <header class="header_2Nj88">
+        <header class="header_2Nj88 icon-svg">
             <div class="div_i55ej">
                 <label class="label_s5nPu">
                     <input type="checkbox" ${ localStorage.getItem('theme') == 'dark' ? 'checked' : ''}>

@@ -1,19 +1,3 @@
-
-function clickElement (element, callback){
-    if(typeof callback == 'function') {
-        element.addEventListener('click', e => e.target === e.currentTarget && callback(e))
-    }
-}
-
-function clickElementclosest (element, queryElement, callback){
-    if(typeof callback == 'function') {
-        element.addEventListener('click', e => {
-            const target = e.target.closest(queryElement)
-            if(target) callback(target, e) 
-        })
-    }
-}
-
 function addRemoveEventListener (element, event, callback){
     const def_callback =()=>{
         if(typeof callback === 'function') callback()
@@ -30,10 +14,6 @@ function addRemoveEventListenerHashchange (element, type, callback){
     }
 }
 
-function json(_var_, _json_ = true) {
-    return _json_ ? JSON.parse(_var_) : JSON.stringify(_var_)
-}
- 
 function trimString(text = '', symbol = '') {
     if(symbol != ''){
         text = text.startsWith(symbol) ? text.slice(1) : text
@@ -94,14 +74,6 @@ function genereteKey (include = {}){
     })
 }
 
-function getElement(select, root = document) {
-    return root.querySelector(select)
-}
-
-function getElementAll(select, root = document) {
-    return root.querySelectorAll(select)
-}
-
 function appendElement(element, ...elements) {
     elements = elements.map(element => {
         if(typeof element == 'function') element = element()
@@ -119,6 +91,14 @@ function createHTML(html) {
     return elementHTML
 }
 
+function getTimeBySecond(seconds) {
+    return {
+        hours   : Math.floor(seconds / 3600),
+        minutes : Math.floor((seconds % 3600) / 60),
+        seconds : seconds % 60
+    }
+}
+
 class createCSS {
     constructor (id, root = document) {
         this._id        = id
@@ -134,11 +114,6 @@ class createCSS {
         this._styleIsDOM    = document.getElementById(this._styleID)
         this._styleElement  = this._styleIsDOM ?? document.createElement('style')
         this._styleElement.innerHTML = ''
-
-        // const styles = []
-        // if(!sessionStorage.getItem('styles')){ 
-        //     sessionStorage.setItem('styles', JSON.stringify(styles))
-        // }
 
         if(!this._styleIsDOM){
             this._styleElement.setAttribute('id', this._styleID )
@@ -173,11 +148,6 @@ class createCSS {
                 if(!listClassName.includes(className)) listClassName.push(className)
             }
         })
-
-        // if(!this._isStyle) {
-        //     styles.push({ id : code, name : element })
-        //     sessionStorage.setItem('styles', JSON.stringify(styles))
-        // }
 
         this._class = listClassName.map((className, index) => {
             return (index == 0 ? '' : '.') + className.trim()
@@ -238,17 +208,20 @@ class Hash {
     }
 
     dispatch(callback){ 
-        const change =()=>{
-            if (typeof callback === 'function') callback()
-            this.__change()
+
+        if( this._dispatch ) {
+
+            this._dispatch = false
+            const hashchange =()=>{
+                if (typeof callback === 'function') callback( this.__change() )
+                else this.__change()
+            }
+
+            hashchange()
+            window.addEventListener('hashchange', hashchange)
+            
         }
 
-        if(this._dispatch) {
-            change()
-            window.addEventListener('hashchange', change)
-        } 
-
-        this._dispatch = false
     }
 
     __change(){
@@ -257,7 +230,7 @@ class Hash {
         this._params = trimString(location.hash.slice(1), '/')
 
         const findRoute = this._routes.find(route => {
-
+            
             if(route.dinamic){
 
                 const splitRoute = route.route.split('/')
@@ -275,15 +248,320 @@ class Hash {
  
             } else if(route.route == this._params) {
                 return route
+            } else if(route.route == '*'){
+                return route
             }
             
             return false
         })
 
         if(findRoute){
-            sessionStorage.setItem('params', JSON.stringify(params))
-            if (typeof findRoute.callback === 'function') findRoute.callback(params)
+            sessionStorage.setItem('params', JSON.stringify( params ))
+            if (typeof findRoute.callback === 'function') return findRoute.callback( params )
+            return null
         }
 
     }
 }
+
+class findElement {
+    constructor(root = document){
+        this._root          = root
+        this._element       = null
+        this._elementTemp   = document.createElement('div')
+        
+    }
+
+    get(query, create = false){
+        this._element = this._root.querySelector(query)
+        if(create) return this._element ?? this._elementTemp
+        return this._element
+    }
+
+    getAll(query){
+        return this._root.querySelectorAll(query)
+    }
+}
+
+function ls(item) {
+    this._item = item
+    this._data = ''
+
+    const _this = {
+        data: (data) => { 
+            this._data = data 
+            return _this;
+        },
+        put: (json = false, string = false) => { 
+            const data = localStorage.getItem(this._item)
+
+            if(data){
+                this._data = data
+                return json ? JSON.parse(this._data) : this._data
+            }
+
+            localStorage.setItem(this._item, string ? JSON.stringify(this._data) : this._data)
+            return this._data;
+        },
+        set: (string = false) => { 
+            localStorage.setItem(this._item, string ? JSON.stringify(this._data) : this._data)
+            return this._data;
+        },
+        get: (json = false) => { 
+            this._data  = localStorage.getItem(this._item, this._data) 
+            return json ? JSON.parse(this._data) : this._data;
+        },
+        remove: () => { 
+            localStorage.removeItem(this._item)
+            return !localStorage.getItem(this._item);
+        }
+    }
+
+    return _this
+}
+
+function ss(item) {
+    this._item = item
+    this._data = ''
+
+    const _this = {
+        data: (data) => { 
+            this._data = data 
+            return _this;
+        },
+        put: (json = false, string = false) => { 
+            const data = sessionStorage.getItem(this._item)
+
+            if(data){
+                this._data = data
+                return json ? JSON.parse(this._data) : this._data
+            }
+
+            sessionStorage.setItem(this._item, string ? JSON.stringify(this._data) : this._data)
+            return this._data;
+        },
+        set: (string = false) => { 
+            sessionStorage.setItem(this._item, string ? JSON.stringify(this._data) : this._data)
+            return this._data;
+        },
+        get: (json = false) => { 
+            this._data  = sessionStorage.getItem(this._item, this._data) 
+            return json ? JSON.parse(this._data) : this._data;
+        },
+        remove: () => { 
+            sessionStorage.removeItem(this._item)
+            return !sessionStorage.getItem(this._item);
+        }
+    }
+
+    return _this
+}
+
+const diffDateBirthday =(Date1, Date2 = Date.now())=>{
+
+    const thisYear = new Date().getFullYear()
+
+    const lastYear = new Date(Date1)
+    lastYear.setFullYear(thisYear)
+    
+    const BirthdayThisYear = new Date(Date1)
+    BirthdayThisYear.setFullYear(thisYear)
+
+    if(Date2 > BirthdayThisYear.getTime()) BirthdayThisYear.setFullYear(thisYear + 1)
+    else lastYear.setFullYear(thisYear - 1)
+
+    const diffTotal         = BirthdayThisYear.getTime() - lastYear.getTime()
+    const diffelapsed       = Date2 - lastYear.getTime() 
+    const difdRemaining     = BirthdayThisYear.getTime() - Date2;
+
+    const day = {
+        total       : Math.floor(diffTotal / (1000 * 60 * 60 * 24)),
+        elapsed     : Math.round(diffelapsed / (1000 * 60 * 60 * 24)),
+        remaining   : Math.floor(difdRemaining / (1000 * 60 * 60 * 24))
+    }
+
+    const hour = {
+        total       : Math.floor((diffTotal / (1000 * 60 * 60))),
+        elapsed     : Math.round((diffelapsed / (1000 * 60 * 60))),
+        remaining   : Math.floor((difdRemaining / (1000 * 60 * 60)) % 24)
+    }
+
+    const minute = {
+        total       : Math.floor((diffTotal / 1000 / 60)),
+        elapsed     : Math.round((diffelapsed / 1000 / 60) % 60),
+        remaining   : Math.floor((difdRemaining / 1000 / 60) % 60)
+    }
+
+    const second = {
+        total       : Math.floor((diffTotal / 1000)),
+        elapsed     : Math.round((diffelapsed / 1000) % 60),
+        remaining   : Math.floor((difdRemaining / 1000) % 60)
+    }
+
+    const age = (BirthdayThisYear.getFullYear() - 1) - new Date(Date1).getFullYear()
+
+    const complete = {
+        total       : 100,
+        elapsed     : parseFloat(((day.elapsed / day.total) * 100).toFixed(2)),
+        remaining   : parseFloat(((day.remaining / day.total) * 100).toFixed(2))
+    } 
+
+    return {
+        day,
+        hour,
+        minute,
+        second,
+        age,
+        complete
+    }
+}
+
+const datapi = (()=> {
+    const method = async (uri = '', method = 'POST', data = {}, options = {})=>{
+        const option = {
+            method,
+        }
+
+        if( Object.keys(data).length ){
+            option.body = JSON.stringify(data)
+        }
+
+        delete options.method
+        delete options.body
+
+        const res = await fetch(uri, {...option, ...options})
+        return await res.json()
+    }
+        
+    const get = async (...params)=>{
+        return await method(params[0], 'GET', {}, params[1])
+    }
+
+    const post = async (...params)=>{
+        return await method(params[0], 'POST', params[1], params[2])
+    }
+
+    const put = async (...params)=>{
+        return await method(params[0], 'PUT', params[1], params[2])
+    }
+
+    const _delete = async (...params)=>{
+        return await method(params[0], 'DELETE', params[1], params[2])
+    }
+
+    const patch = async (...params)=>{
+        return await method(params[0], 'PATCH', params[1], params[2])
+    }
+
+    return { get, post, put, patch, delete : _delete }
+})()
+
+
+function copyToClipboard(text = '') {
+    const textarea = document.createElement('textarea')
+    textarea.setAttribute('style', 'position: fixed; top: 0; transform: translateY(-100%);')
+    textarea.value = text;
+
+    document.body.append(textarea);
+
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+
+    document.execCommand('copy');
+
+    textarea.remove()
+}
+
+class FileLoad {
+    constructor(file = null){
+        this.__file = file
+        this.__progress
+        this.__load
+    }
+
+    progress(callback){
+        this.__progress = callback
+    }
+
+    load(callback) {
+        this.__load = callback
+    }
+
+    start(){
+        const reader = new FileReader()
+        reader.addEventListener('progress', e => {
+            if(typeof this.__progress == 'function') this.__progress(e)
+        })
+        reader.addEventListener('load', e => {
+            if(typeof this.__load == 'function') this.__load(e)
+        })
+        reader.readAsDataURL(this.__file)
+    }
+}
+
+class Alert {
+    constructor(element) {
+        this.__element = createHTML('<div class="div_1N2Xi0S4ana9y95"></div>')
+        element.append(this.__element)
+    }
+
+    show(data = {}) {
+
+        const element = createHTML(`<div class="div_3897A2mOM93uOdP">${ data.message ?? '' }</div>`)
+        this.__element.prepend(element)
+
+        if(this.__element.children.length > 3) {
+            const [elementLast] =[...this.__element.children].slice(-1)
+            if(elementLast) elementLast.remove()
+        }
+
+        setTimeout(()=> {
+            element.remove()
+        }, 1500)
+
+    }
+}
+
+
+function setCookie(nombre, valor, diasParaExpirar, httpOnly = false, secure = false) {
+    const fechaExpiracion = new Date();
+    fechaExpiracion.setTime(fechaExpiracion.getTime() + (diasParaExpirar * 24 * 60 * 60 * 1000));
+    const expira = "expires=" + fechaExpiracion.toUTCString();
+    
+    const httpOnlyString = httpOnly ? "; HttpOnly" : "";
+    
+    // Agrega "; Secure" solo si secure es verdadero
+    const secureString = secure ? "; Secure" : "";
+    
+    document.cookie = nombre + "=" + valor + "; " + expira + "; path=/" + httpOnlyString + secureString;
+}
+
+function getCookie(nombre) {
+    const nombreC = nombre + "=";
+    const cookies = document.cookie.split(';');
+    
+    for(let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1);
+        }
+        if (cookie.indexOf(nombreC) == 0) {
+            return cookie.substring(nombreC.length, cookie.length);
+        }
+    }
+    
+    return "";
+}
+
+function objectFormData(data = {}) {
+    const formData = new FormData()
+
+    if( typeof data == 'object' ) {
+        for (const key in data) {
+            formData.append(key, data[key])
+        }
+    }
+
+    return formData
+}
+ 

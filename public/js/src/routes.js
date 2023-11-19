@@ -1,15 +1,18 @@
 import inicio from "../page/inicio.js";
-import recepcionIDNombre from "../page/recepcionIDNombre.js";
+import productoIdCategoria from "../page/productoIdCategoria.js";
 
 export default ()=>{
 
-    const main =  getElement('#main')
+    const main =  document.getElementById('main')
 
     const Route = new Hash()
 
     Route.param('/', inicio)
-    Route.param('/recepcion', inicio)
-    Route.param('/recepcion/:id_categoria', recepcionIDNombre)
+    Route.param('/producto', inicio)
+    Route.param('/producto/:id_categoria', productoIdCategoria)
 
-    Route.dispatch(()=> main.innerHTML = '')
+    Route.dispatch((page)=> {
+        main.innerHTML = ''
+        main.append( page ) 
+    })
 }

@@ -20,18 +20,7 @@ body {
   background: var(--color-background);
   user-select: none;
 }
-
-#root {
-  position: fixed;
-  inset: 0;
-
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr auto;
-
-  overflow: hidden;   
-}
-
+ 
 .scroll-y {
   overflow-x: hidden;
   overflow-y: auto;
@@ -66,4 +55,20 @@ input {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pointer {
+  cursor: pointer;
+
+  &:hover {
+    opacity: .5;
+  }
+}
+
+.icon-svg {
+  & svg {
+    width: 20px;
+    height: 20px;
+    fill : var(--color-letter);
+  }
 }
