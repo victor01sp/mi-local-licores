@@ -1,4 +1,7 @@
 export default (data)=>{
+
+    const api = (uri = '') => ss('api').get() + uri
+
     const ElementComponent = createHTML(`
         <div class="div_coYHY1d">
             <div class="div_hs8YwzJ"></div>
@@ -7,7 +10,7 @@ export default (data)=>{
                     
                     <div class="div_Ale0G7A icon-svg">
                         <div class="div_686E97q">
-                            <img src="http://192.168.1.9/servidor-4/licores-manage/storage/productos/${ data.img }">
+                            <img src="${ api(`/storage/productos/${ data.img }`) }">
                         </div>
                         <div class="div_R77tzMq">
                             <p>${ data.description }</p>
