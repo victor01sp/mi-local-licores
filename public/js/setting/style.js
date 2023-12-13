@@ -1,7 +1,7 @@
 export default ()=>{
 
     ls('theme').data('light').put()
-
+ 
     const themeLight = {
         'color-background' : '#F7F7F7',
         'color-item'    : '#ffffff',

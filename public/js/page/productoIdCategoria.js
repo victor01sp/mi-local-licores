@@ -1,8 +1,11 @@
 import modalProducto from "../components/modalProducto.js"
 
-export default (params)=>{
+export default ()=>{
 
-    const api = (uri = '') => ss('api').get() + uri 
+    const api = (uri = '') => sessionStorage.getItem('api') + uri 
+    const paramQueries = (query = {}) => Object.keys(query).map(key => `${ key }=${ query[key] }`).join('&')
+
+    const params    = JSON.parse( sessionStorage.getItem('params') )
     const Icon = new iconSVG()
     //<div class="div_04bAm9R"><span class="loader"></span></div>
     const ElementComponent = createHTML(`
@@ -38,10 +41,14 @@ export default (params)=>{
         const fragment = document.createDocumentFragment()
 
         Data.forEach(data => {
+            console.log(data);
+
+            const img = data.img != '' ? api(`/storage/productos/${ data.img }`) : './public/img/icons/gallery.png'
+
             const element = createHTML(`
                 <div class="div_Ale0G7A icon-svg pointer" id="a-${ data.id }">
-                    <div class="div_686E97q">
-                        <img src="${ api(`/storage/productos/${ data.img }`) }">
+                    <div class="div_686E97q" style="display:flex">
+                        <img src="${ img }" ${ data.img == '' ? `style="width:40px;height:40px;margin:auto"` :'' }>
                     </div>
                     <div class="div_R77tzMq">
                         <p>${ data.description }</p>
@@ -65,7 +72,13 @@ export default (params)=>{
     }
 
     const dataLoad =()=>{
-        datapi.get(api(`/api/producto?id_categoria=${ params.id_categoria }`))
+
+        const queries = {
+            query : true,
+            id_categoria : params.id_categoria
+        }   
+
+        datapi.get(api(`/api/producto?${ paramQueries( queries) }`))
             .then(dataRender)
     }
 
